@@ -19,7 +19,7 @@ project pSix "Web Game"  2025-12-15 +5m {
   # the project reports. If not specified, the current day will be
   # used, but this will likely be outside of the project range, so it
   # can't be seen in the reports.
-  now 2026-02-25-13:00
+  now 2026-04-09-12:00
   # The currency for all money values is the US Dollar.
   currency "EUR"
 
@@ -67,6 +67,11 @@ resource dev2 "Samantha Müller" {
 }
 resource dev3 "Peter Green" {
   email "kkk@unizar.es"
+}
+
+resource dev4 "Alberto Dupla" {
+  email "898896@unizar.es"
+  workinghours mon - sun 16:00 - 20:00
 }
 
 # Now we specify the work packages. The whole project is described as
@@ -154,6 +159,9 @@ task WMGame "Web & Mobile Game" {
       actual:effort 20d
       depends WMGame.twebF
       depends WMGame.tback
+      depends WMGame.tmobileF
+      depends WMGame.tcloud
+      minstart 2026-05-15
       }
 
     
@@ -182,7 +190,61 @@ task WMGame "Web & Mobile Game" {
       charge 12000.0 onstart
     }
   }
+
+  task tmobileF "Mobile Front End" {
+    allocate dev4
+    purge chargeset
+    chargeset wFront
+    responsible dev3
+    depends WMGame.tback.tBEd
+    task tGUId "Mobile GUI Design" {
+      effort 9d
+      actual:effort 15d
+      allocate dev3
+      journalentry 2026-01-15 "Problems with the GUI design tool" {
+        author dev3
+        alert yellow
+        summary "The tool used for the GUI design has given me a lot of problems. I recommend to look for other one."
+      }
+    }
+    task tFEc "Mobile Front End Construction" {
+      allocate dev4
+      effort 15d
+      allocate dev2, dev3
+      depends WMGame.tmobileF.tGUId
+      journalentry 2026-04-09 "Nota practica" {
+        author dev4
+        alert yellow
+        summary "There's an issue with the develompent on the login screen, it doesn't change the phone's orientation." 
+      }
+    }
+    task tFEt "Mobile Front End Test" {
+      allocate dev4
+      effort 6d
+      allocate dev1
+      depends WMGame.tmobileF.tFEc
+    }    
 }
+
+  task tcloud "Back End Cloud Deployment" {
+    purge chargeset
+    chargeset back  
+    depends WMGame.tback 
+    allocate dev4
+    task tceval "Cloud Evaluation" {
+      allocate dev4
+      effort 3d
+      allocate dev1
+    }
+    task tcdeploy "Deployment" {
+      allocate dev4
+      effort 4d
+      allocate dev1
+      depends WMGame.tcloud.tceval 
+    }
+  }
+}
+
 
 # Now the project has been specified completely. Stopping here would
 # result in a valid TaskJuggler file that could be processed and
@@ -326,6 +388,14 @@ taskreport development "" {
   timeformat "%Y-%m-%d"
   hideresource ~(isleaf() & isleaf_())
   sortresources name.up
+}
+
+# Report to show the project's initial planning"
+taskreport plan_inicial "" {
+  formats html
+  headline "Planificación Inicial del Proyecto"
+  columns bsi { title 'WBS' }, name, start, end, effort, chart { scale day }
+  scenarios plan 
 }
 
 # A list of all employees with their contact details.
