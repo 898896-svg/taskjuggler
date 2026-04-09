@@ -391,7 +391,7 @@ taskreport development "" {
 }
 
 # Report to show the project's initial planning"
-taskreport plan_inicial "" {
+taskreport plan_inicial "plan_inicial" {
   formats html
   headline "Planificación Inicial del Proyecto"
   columns bsi { title 'WBS' }, name, start, end, effort, chart { scale day }
